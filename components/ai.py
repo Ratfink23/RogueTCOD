@@ -29,7 +29,7 @@ class CorpseMonster:
         results = []
         # decay corpse if outside of FOV
         if not libtcod.map_is_in_fov(fov_map, self.owner.x, self.owner.y):
-            if randint(1, 100) < self.decay_amount:
+            if randint(50, 500) < self.decay_amount:
                 self.decay(entities)
                 results.append({'message': Message('Something decays in the distance', libtcod.grey)})
                 self.decay_amount = 0

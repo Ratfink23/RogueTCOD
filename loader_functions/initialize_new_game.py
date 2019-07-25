@@ -15,8 +15,8 @@ from equipment_slots import EquipmentSlots
 def get_constants():
     window_title = "Roguelike Tutorial Revised"
 
-    screen_width = 160
-    screen_height = 100
+    screen_width = 80
+    screen_height = 50
 
     bar_width = 20
     panel_height = 7
@@ -26,8 +26,8 @@ def get_constants():
     message_width = screen_width - bar_width - 2
     message_height = panel_height - 1
 
-    map_width = 160
-    map_height = 86
+    map_width = 80
+    map_height = 43
 
     room_max_size = 10
     room_min_size = 6
