@@ -1,4 +1,5 @@
 import tcod as libtcod
+import tcod.event as tcodevent
 
 from death_functions import kill_monster, kill_player
 from entity import get_blocking_entities_at_location
@@ -16,10 +17,11 @@ def main():
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'], False)
+    libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'],
+                              False, libtcod.RENDERER_SDL2, 'F', True)
 
-    con = libtcod.console_new(constants['screen_width'],constants['screen_height'])
-    panel = libtcod.console_new(constants['screen_width'], constants['panel_height'])
+    con = libtcod.console.Console(constants['screen_width'],constants['screen_height'])
+    panel = libtcod.console.Console(constants['screen_width'], constants['panel_height'])
 
     player = None
     entities = []
@@ -71,7 +73,7 @@ def main():
                 break
 
         else:
-            libtcod.console_clear(con)
+            libtcod.console.Console.clear(con)
             play_game(player, entities, game_map, message_log, game_state, con, panel, constants)
 
             show_main_menu = True
@@ -181,7 +183,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     entities = game_map.next_floor(player, message_log, constants)
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
-                    libtcod.console_clear(con)
+                    libtcod.console.Console.clear(con)
 
                     break
             else:

@@ -2,7 +2,9 @@ import tcod as libtcod
 import math
 
 from components.item import Item
+from components import ai, fighter
 from render_functions import RenderOrder
+
 
 class Entity:
     # A generic object to represent players, enemies, items etc.
@@ -74,8 +76,8 @@ class Entity:
         dy = target_y - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
 
-        dx = int(round(dx/distance))
-        dy = int(round(dy/distance))
+        dx = int(round(dx / distance))
+        dy = int(round(dy / distance))
 
         if not (game_map.is_blocked(self.x + dx, self.y + dy) or
                 get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
@@ -124,10 +126,8 @@ class Entity:
             # Delete the path to free memory
         libtcod.path_delete(my_path)
 
-
-    def distance(self,x,y):
-        return math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
-
+    def distance(self, x, y):
+        return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def distance_to(self, other):
         dx = other.x - self.x
@@ -137,6 +137,34 @@ class Entity:
 
 def get_blocking_entities_at_location(entities, destination_x, destination_y):
     for entity in entities:
-            if entity.blocks and entity.x == destination_x and entity.y == destination_y:
-                return entity
+        if entity.blocks and entity.x == destination_x and entity.y == destination_y:
+            return entity
     return None
+
+
+def spawn_fighter(x,y, monster_type='orc'):
+    """ Spawn a fighter Entity at x, y of the class monster_type"""
+    # TODO Pull attributes of monsters from a lookup
+    if monster_type == 'orc':
+        fighter_component = fighter.Fighter(hp=20, defense=0, power=4, xp=35)
+        ai_component = ai.BasicMonster()
+        mob_char = 'o'
+        mob_color = libtcod.desaturated_green
+        mob_name = 'Orc'
+    elif monster_type == 'troll':
+        fighter_component = fighter.Fighter(hp=30, defense=2, power=8, xp=100)
+        ai_component = ai.BasicMonster()
+        mob_char = 'T'
+        mob_color = libtcod.darker_green
+        mob_name = 'Troll'
+    else:
+        fighter_component = fighter.Fighter(hp=5, defense=0, power=1, xp=5)
+        ai_component = ai.BreedingMonster()
+        mob_char = 'w'
+        mob_color = libtcod.white
+        mob_name = 'worm mass'
+
+    monster = Entity(x, y, mob_char, mob_color, mob_name, blocks=True,
+                     render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+
+    return monster
