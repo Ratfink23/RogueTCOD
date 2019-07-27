@@ -1,6 +1,6 @@
 import tcod as libtcod
 
-from components.ai import ConfusedMonster
+from components import ai
 from game_messages import Message
 
 
@@ -92,14 +92,14 @@ def cast_confuse(*args, **kwargs):
         return results
 
     for entity in entities:
-        if entity.x == target_x and entity.y == target_y and entity.ai != ConfusedMonster and entity.ai:
-            confused_ai = ConfusedMonster(entity.ai, 10)
+        if entity.x == target_x and entity.y == target_y and entity != ai.ConfusedMonster and entity.ai:
+            confused_ai = ai.ConfusedMonster(entity.ai, 10)
 
             confused_ai.owner = entity
             entity.ai = confused_ai
 
-            results.append({'consumed': True, 'message': Message(
-                '{0} looks confsued vacant, as they starts top stumble around!'.format(entity.display_name),
+            results.append({'consumed': True,
+                            'message': Message('{0} looks confused, as they starts top stumble around!'.format(entity.full_name),
                 libtcod.light_green)})
 
             break

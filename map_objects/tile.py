@@ -6,7 +6,7 @@ class Tile:
     def __init__(self, blocked, block_sight=None):
         self.blocked = blocked
 
-        #by default, if the tile is blocked, it also blocks sight
+        # by default, if the tile is blocked, it also blocks sight
         if block_sight is None:
             block_sight = blocked
 

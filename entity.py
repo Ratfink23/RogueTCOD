@@ -2,12 +2,12 @@ import tcod as libtcod
 import math
 
 from components.item import Item
-from components import ai, fighter
 from render_functions import RenderOrder
 
 
 class Entity:
     # A generic object to represent players, enemies, items etc.
+    # TODO Add heath name to the entity, i.e. Healthy Orc, Wounded Troll, Undead Skeleton?
 
     def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None,
                  item=None, inventory=None, stairs=None, level=None, equipment=None, equippable=None, state_name=None):
@@ -57,8 +57,8 @@ class Entity:
                 self.item.owner = self
 
     @property
-    def display_name(self):
-        """ Creates the full name of an entity"""
+    def full_name(self):
+        # Returns the full name of an entity
         if self.state_name:
             fullname = self.name + ' ' + self.state_name
         else:
@@ -67,11 +67,12 @@ class Entity:
         return fullname
 
     def move(self, dx, dy):
-        # move the entity be a given amount
+        # Move entity one step in direction dx, dy
         self.x += dx
         self.y += dy
 
     def move_towards(self, target_x, target_y, game_map, entities):
+        # Move entity one step in direction of target with block check
         dx = target_x - self.x
         dy = target_y - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -84,6 +85,7 @@ class Entity:
             self.move(dx, dy)
 
     def move_astar(self, target, entities, game_map):
+        # Astar movement code directly from Roguelike Tutorial
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(game_map.width, game_map.height)
 
@@ -140,31 +142,3 @@ def get_blocking_entities_at_location(entities, destination_x, destination_y):
         if entity.blocks and entity.x == destination_x and entity.y == destination_y:
             return entity
     return None
-
-
-def spawn_fighter(x,y, monster_type='orc'):
-    """ Spawn a fighter Entity at x, y of the class monster_type"""
-    # TODO Pull attributes of monsters from a lookup
-    if monster_type == 'orc':
-        fighter_component = fighter.Fighter(hp=20, defense=0, power=4, xp=35)
-        ai_component = ai.BasicMonster()
-        mob_char = 'o'
-        mob_color = libtcod.desaturated_green
-        mob_name = 'Orc'
-    elif monster_type == 'troll':
-        fighter_component = fighter.Fighter(hp=30, defense=2, power=8, xp=100)
-        ai_component = ai.BasicMonster()
-        mob_char = 'T'
-        mob_color = libtcod.darker_green
-        mob_name = 'Troll'
-    else:
-        fighter_component = fighter.Fighter(hp=5, defense=0, power=1, xp=5)
-        ai_component = ai.BreedingMonster()
-        mob_char = 'w'
-        mob_color = libtcod.white
-        mob_name = 'worm mass'
-
-    monster = Entity(x, y, mob_char, mob_color, mob_name, blocks=True,
-                     render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-
-    return monster

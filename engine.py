@@ -10,7 +10,7 @@ from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from loader_functions.data_loaders import load_game, save_game
 from menus import main_menu, message_box
-from render_functions import clear_all, render_all
+from render_functions import clear_all, render_all, RenderOrder
 
 def main():
     constants = get_constants()
@@ -37,7 +37,9 @@ def main():
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
+    # TODO review exit event in tcod rather than libtcodpy
     while not libtcod.console_is_window_closed():
+        # TODO review event key in tcod rather libtcodpy
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         if show_main_menu:
@@ -91,7 +93,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
     targeting_item = None
 
+    # TODO find quit method in tcod rather than libtcod
     while not libtcod.console_is_window_closed():
+        # TODO review event key in tcod rather libtcodpy
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
@@ -142,6 +146,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     player_turn_results.extend(attack_results)
                 else:
                     player.move(dx, dy)
+                    for entity in entities:
+                        # display entities on the floor unless they are the ACTOR
+                        if entity.x == player.x and entity.y == player.y and entity.render_order != RenderOrder.ACTOR:
+                            message_log.add_message(Message('{0} is on the floor here'.format(entity.full_name), libtcod.yellow))
 
                     fov_recompute = True
 

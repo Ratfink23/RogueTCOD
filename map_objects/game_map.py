@@ -1,26 +1,23 @@
 import tcod as libtcod
 from random import randint
 
-from components.equipment import EquipmentSlots
-from components.equippable import Equippable
-from components.item import Item
 from components.staris import Stairs
 
 from render_functions import RenderOrder
-from entity import Entity, spawn_fighter
+from entity import Entity
+from spawner import spawn_fighter, spawn_item
 from game_messages import Message
-from item_functions import cast_confuse, cast_fireball, cast_lightning, heal
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
-from randon_utils import random_choice_from_dict, from_dungeon_level
+from randon_utils import random_choice_from_dict, from_dungeon_depth
 
 
 class GameMap:
-    def __init__(self, width, height, dungeon_level=1):
+    def __init__(self, width, height, dungeon_depth=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
-        self.dungeon_level = dungeon_level
+        self.dungeon_level = dungeon_depth
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -107,24 +104,26 @@ class GameMap:
             self.tiles[x][y].block_sight = False
 
     def place_entities(self, room, entities):
+        # TODO remove all generation of enemy / item away into spawner. Pass the dungeon level and return item.
+
         # max mobs based on dungeon depth
-        max_monsters_per_room = from_dungeon_level([[2, 1], [3, 4], [5, 6]], self.dungeon_level)
-        max_items_per_room = from_dungeon_level([[1, 1], [2, 4]], self.dungeon_level)
+        max_monsters_per_room = from_dungeon_depth([[2, 1], [3, 4], [5, 6]], self.dungeon_level)
+        max_items_per_room = from_dungeon_depth([[1, 1], [2, 4]], self.dungeon_level)
 
         # get a random number of monsters
         number_of_monsters = randint(0, max_monsters_per_room)
         number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {'orc': 80,
-                           'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
+                           'troll': from_dungeon_depth([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
                            }
 
         item_chances = {'healing_potion': 35,
-                        'sword': from_dungeon_level([[5, 4]], self.dungeon_level),
-                        'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
-                        'lighting_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
-                        'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
-                        'confusion_scroll': from_dungeon_level([[10, 2]], self.dungeon_level)
+                        'sword': from_dungeon_depth([[5, 4]], self.dungeon_level),
+                        'shield': from_dungeon_depth([[15, 8]], self.dungeon_level),
+                        'lighting_scroll': from_dungeon_depth([[25, 4]], self.dungeon_level),
+                        'fireball_scroll': from_dungeon_depth([[25, 6]], self.dungeon_level),
+                        'confusion_scroll': from_dungeon_depth([[10, 2]], self.dungeon_level)
                         }
 
         for i in range(number_of_monsters):
@@ -134,14 +133,8 @@ class GameMap:
 
             # if there is no monster already on the location
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                # TODO monster generator than holds the monster dict and returns a Entity
                 monster_choice = random_choice_from_dict(monster_chances)
-
-                if monster_choice == 'orc':
-                    monster = spawn_fighter(x, y, 'orc')
-                else:
-                    monster = spawn_fighter(x, y, 'troll')
-
+                monster = spawn_fighter(x, y, monster_choice)
                 entities.append(monster)
 
         for i in range(number_of_items):
@@ -149,36 +142,8 @@ class GameMap:
             y = randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                # TODO Item generation based on depth than returns an item.
                 item_choice = random_choice_from_dict(item_chances)
-
-                if item_choice == 'healing_potion':
-                    item_component = Item(use_function=heal, amount=40)
-                    item = Entity(x, y, '!', libtcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM,
-                                  item=item_component)
-                elif item_choice == 'sword':
-                    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-                    item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)
-                elif item_choice == 'shield':
-                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-                    item = Entity(x, y, '[', libtcod.dark_orange, 'Shield', equippable=equippable_component)
-
-                elif item_choice == 'fireball_scroll':
-                    item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
-                        'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
-                                          damage=25, radius=3)
-                    item = Entity(x, y, '#', libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM,
-                                  item=item_component)
-                elif item_choice == 'confusion_scroll':
-                    item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
-                        'Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan))
-                    item = Entity(x, y, '#', libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,
-                                  item=item_component)
-                else:
-                    item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5)
-                    item = Entity(x, y, '#', libtcod.yellow, 'Lighting Scroll', render_order=RenderOrder.ITEM,
-                                  item=item_component)
-
+                item = spawn_item(x, y, item_choice)
                 entities.append(item)
 
     def next_floor(self, player, message_log, constants):

@@ -2,10 +2,14 @@ import tcod as libtcod
 
 from random import randint
 from game_messages import Message
-from entity import spawn_fighter
+from spawner import spawn_fighter
 
+# TODO Archery AI
+# TODO redo Breeding AI to add breeding
+# TODO Change CorpseMonster to spawn different monster based on decay
 
 class BasicMonster:
+    # TODO Monster memory of where the last target was
     def take_turn(self, target, fov_map, game_map, entities):
         results = []
 
