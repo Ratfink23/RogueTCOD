@@ -12,8 +12,27 @@ class RenderOrder(Enum):
         ACTOR = 4
 
 
+def render_mouse(mouse_window, mouse, screen_width, screen_height, fov_map):
+    """
+    Create a 'X'in mouse_window under mouse while in FOV
+
+    :param mouse_window:
+    :param mouse:
+    :param screen_width:
+    :param screen_height:
+    :param fov_map:
+    :return:
+    """
+    if libtcod.map_is_in_fov(fov_map, mouse.cx, mouse.cy):
+        libtcod.console_set_char_foreground(mouse_window, mouse.cx, mouse.cy, libtcod.yellow)
+        libtcod.console_set_char(mouse_window, mouse.cx, mouse.cy, 'X')
+        libtcod.console_blit(mouse_window, 0, 0, screen_width, screen_height, 0, 0, 0, 1, 0)
+        libtcod.console.Console.clear(mouse_window)
+
+
 def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
                bar_width, panel_height, panel_y, mouse, colors, game_state):
+
     if fov_recompute:
         # Draw all the tiles
         for y in range(game_map.height):
@@ -23,15 +42,22 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
                 if visible:
                     if wall:
+                        libtcod.console_set_char_foreground(con, x, y, colors.get('light_ground'))
+                        libtcod.console_set_char(con, x, y, '=')
                         libtcod.console_set_char_background(con, x, y, colors.get('light_wall'), libtcod.BKGND_SET)
                     else:
+                        libtcod.console_set_char_foreground(con, x, y, colors.get('light_wall'))
+                        libtcod.console_set_char(con, x, y, '.')
                         libtcod.console_set_char_background(con, x, y, colors.get('light_ground'), libtcod.BKGND_SET)
                     game_map.tiles[x][y].explored = True
-
                 elif game_map.tiles[x][y].explored:
                     if wall:
+                        libtcod.console_set_char_foreground(con, x, y, colors.get('dark_ground'))
+                        libtcod.console_set_char(con, x, y, '=')
                         libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
                     else:
+                        libtcod.console_set_char_foreground(con, x, y, colors.get('dark_wall'))
+                        libtcod.console_set_char(con, x, y, '.')
                         libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
 
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
@@ -54,9 +80,10 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     # HP Bar
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp, libtcod.light_red, libtcod.darker_red)
-    libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT, 'Dungeon Depth: {0}'.format(game_map.dungeon_level))
+    libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT, 'Dungeon Depth: {0}'.format(game_map.dungeon_depth))
 
-    libtcod.console_set_default_foreground(panel, libtcod.light_gray)
+    # print output from entities under mouse
+    libtcod.console_set_default_foreground(panel, libtcod.white)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                              get_names_under_mouse(mouse, entities, fov_map))
 
@@ -65,9 +92,9 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     # Inventory call
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         if game_state == GameStates.SHOW_INVENTORY:
-            inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
+            inventory_title = 'Select from Menu or Esc to cancel.\n'
         else:
-            inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
+            inventory_title = 'Select from Menu or Esc to cancel.\n'
 
         inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
 
@@ -81,12 +108,11 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 def get_names_under_mouse(mouse, entities, fov_map):
     # TODO Highlight area under mouse
     (x, y) = (mouse.cx, mouse.cy)
-
-    names = [entity.full_name for entity in entities
-             if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+    names = [entity.full_name for entity in entities if entity.x == x and entity.y == y and
+             libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
     names = ', '.join(names)
 
-    return names.capitalize()
+    return names
 
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
@@ -110,6 +136,15 @@ def clear_all(con, entities):
 
 
 def draw_entity(con, entity, fov_map, game_map):
+    """
+    Draw entity with background (def=None) on con if within the fov_map or entity is stairs and explored
+    :param con:
+    :param entity:
+    :param fov_map:
+    :param game_map:
+    :param background:
+    :return:
+    """
     if libtcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
         libtcod.console_set_default_foreground(con, entity.color)
         libtcod.console_put_char(con, entity.x, entity.y, entity.char, libtcod.BKGND_NONE)

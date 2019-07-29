@@ -68,7 +68,7 @@ class CorpseMonster:
         else:
             if randint(1, 10) >= 1:
                 # TODO Change test value back to normal
-                monster = spawn_fighter(self.owner.x, self.owner.y, 'worm mass')
+                monster = spawn_fighter(self.owner.x, self.owner.y, monster='worm mass')
                 entities.append(monster)
                 results.append({'message': Message('Something decays in the distance', libtcod.grey)})
             entities.remove(self.owner)

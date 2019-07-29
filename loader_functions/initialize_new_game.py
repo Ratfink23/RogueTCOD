@@ -41,10 +41,10 @@ def get_constants():
     max_items_per_room = 2
 
     colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
-        'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50)
+        'dark_wall': libtcod.darker_gray,
+        'dark_ground': libtcod.dark_gray,
+        'light_wall': libtcod.sepia,
+        'light_ground': libtcod.light_sepia
     }
 
     constants = {
@@ -73,7 +73,7 @@ def get_constants():
     return constants
 
 def get_game_variables(constants):
-    # TODO Move player startup into the standard spawn_monster
+    # TODO Move player startup into the standard spawner
     fighter_component = Fighter(hp=100, defense=1, power=2)
     inventory_component = Inventory(26)
     level_component = Level()

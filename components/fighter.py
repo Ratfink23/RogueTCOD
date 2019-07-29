@@ -19,7 +19,6 @@ class Fighter:
 
         return self.base_max_hp + bonus
 
-
     @property
     def power(self):
         if self.owner and self.owner.equipment:
@@ -38,8 +37,6 @@ class Fighter:
 
         return self.base_defense + bonus
 
-
-
     def take_damage(self, amount):
         results= []
 
@@ -50,13 +47,11 @@ class Fighter:
 
         return results
 
-
     def heal(self, amount):
         self.hp += amount
 
         if self.hp > self.max_hp:
             self.hp = self.max_hp
-
 
     def attack(self, target):
         results = []

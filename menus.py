@@ -2,6 +2,7 @@ import tcod as libtcod
 
 
 def menu(con, header, options, width, screen_width, screen_height):
+
     if len(options) > 26: raise ValueError('Cannot have a menu with more than 26 options.')
 
     # calculate total height for the header (after auto-wrap) and one line per option
@@ -29,6 +30,7 @@ def menu(con, header, options, width, screen_width, screen_height):
     y = int(screen_height / 2 - height / 2)
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
+
 def inventory_menu(con, header, player, inventory_width, screen_width, screen_height):
     # show a menu with each item of the inventory as an option
     if len(player.inventory.items) == 0:
@@ -46,6 +48,7 @@ def inventory_menu(con, header, player, inventory_width, screen_width, screen_he
 
     menu(con, header, options, inventory_width, screen_width, screen_height)
 
+
 def main_menu(con, background_image, screen_width, screen_height):
     libtcod.image_blit_2x(background_image,0,0,0)
 
@@ -56,6 +59,7 @@ def main_menu(con, background_image, screen_width, screen_height):
                              'By Ratfink23')
 
     menu(con, '', ['Play a new game', 'Continue last game', 'Quit'], 24, screen_width, screen_height)
+
 
 def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
     options = ['Constitution (+20 HP, from {0})'.format(player.fighter.max_hp),
@@ -88,7 +92,6 @@ def character_screen(player, character_screen_width, character_screen_height, sc
     x = screen_width // 2 - character_screen_width // 2
     y = screen_height // 2 - character_screen_height // 2
     libtcod.console_blit(window, 0, 0, character_screen_width, character_screen_height, 0, x, y, 1.0, 0.7)
-
 
 
 def message_box(con, header, width, screen_width, screen_height):

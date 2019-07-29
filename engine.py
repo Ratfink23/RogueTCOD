@@ -1,5 +1,4 @@
 import tcod as libtcod
-import tcod.event as tcodevent
 
 from death_functions import kill_monster, kill_player
 from entity import get_blocking_entities_at_location
@@ -10,7 +9,7 @@ from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from loader_functions.data_loaders import load_game, save_game
 from menus import main_menu, message_box
-from render_functions import clear_all, render_all, RenderOrder
+from render_functions import clear_all, render_mouse, render_all, RenderOrder
 
 def main():
     constants = get_constants()
@@ -21,6 +20,7 @@ def main():
                               False, libtcod.RENDERER_SDL2, 'F', True)
 
     con = libtcod.console.Console(constants['screen_width'],constants['screen_height'])
+    mouse_window = libtcod.console.Console(constants['screen_width'],constants['screen_height'])
     panel = libtcod.console.Console(constants['screen_width'], constants['panel_height'])
 
     player = None
@@ -76,11 +76,11 @@ def main():
 
         else:
             libtcod.console.Console.clear(con)
-            play_game(player, entities, game_map, message_log, game_state, con, panel, constants)
+            play_game(player, entities, game_map, message_log, game_state, con, panel, mouse_window, constants)
 
             show_main_menu = True
 
-def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
+def play_game(player, entities, game_map, message_log, game_state, con, panel, mouse_window, constants):
     fov_recompute = True
 
     fov_map = initialize_fov(game_map)
@@ -102,9 +102,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'],
                           constants['fov_algorithm'])
 
+
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
                    constants['screen_width'], constants['screen_height'], constants['bar_width'],
                    constants['panel_height'], constants['panel_y'], mouse, constants['colors'], game_state)
+
+        # Draw Mouse Pointer Layer
+        render_mouse(mouse_window, mouse, constants['screen_width'], constants['screen_height'], fov_map)
 
         fov_recompute = False
 
@@ -112,6 +116,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         clear_all(con, entities)
 
+        # Player Turn Starts
         action = handle_keys(key, game_state)
         mouse_action = handle_mouse(mouse)
 
@@ -131,6 +136,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
 
+        # Process the results of the action
         player_turn_results = []
 
         if move and game_state == GameStates.PLAYERS_TURN:
@@ -149,7 +155,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     for entity in entities:
                         # display entities on the floor unless they are the ACTOR
                         if entity.x == player.x and entity.y == player.y and entity.render_order != RenderOrder.ACTOR:
-                            message_log.add_message(Message('{0} is on the floor here'.format(entity.full_name), libtcod.yellow))
+                            message_log.add_message(Message('{0} is here'.format(entity.full_name), libtcod.yellow))
 
                     fov_recompute = True
 
@@ -268,7 +274,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if item_dropped:
                 entities.append(item_dropped)
-
                 game_state = GameStates.ENEMY_TURN
 
             if equip:

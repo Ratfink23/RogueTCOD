@@ -10,23 +10,50 @@ from entity import Entity
 
 from game_messages import Message
 from item_functions import cast_confuse, cast_fireball, cast_lightning, heal
+from randon_utils import from_dungeon_depth, random_choice_from_dict
 
 
-def spawn_fighter(x,y, monster_type='orc'):
-    """ Spawn a fighter Entity at x, y of the class monster_type"""
+def spawn_fighter(x,y, dungeon_depth=1, monster=None):
+    """
+    Spawn a fighter Entity at x, y of type monster if monster not None.
+    Otherwise randomly assign a monster based on dungeon_depth
+    :param x:
+    :param y:
+    :param dungeon_depth:
+    :param monster:
+    :return:
+    """
     # TODO Pull attributes of monsters from a lookup
-    if monster_type == 'orc':
+
+    monster_chances = {'orc': 80,
+                       'troll': from_dungeon_depth([[15, 3], [30, 5], [60, 7]], dungeon_depth),
+                       'ogre': from_dungeon_depth([[5,3], [10,5], [30, 7]], dungeon_depth)
+                       }
+
+    # if monster name give ignore monster chances table
+    if not monster:
+        monster_choice = random_choice_from_dict(monster_chances)
+    else:
+        monster_choice = monster_chances
+
+    if monster_choice == 'orc':
         fighter_component = fighter.Fighter(hp=20, defense=0, power=4, xp=35)
         ai_component = ai.BasicMonster()
         mob_char = 'o'
-        mob_color = libtcod.desaturated_green
+        mob_color = libtcod.light_green
         mob_name = 'Orc'
-    elif monster_type == 'troll':
+    elif monster_choice == 'troll':
         fighter_component = fighter.Fighter(hp=30, defense=2, power=8, xp=100)
         ai_component = ai.BasicMonster()
         mob_char = 'T'
-        mob_color = libtcod.darker_green
+        mob_color = libtcod.green
         mob_name = 'Troll'
+    elif monster_choice == 'ogre':
+        fighter_component = fighter.Fighter(hp=30, defense=5, power=10, xp=200)
+        ai_component = ai.BasicMonster()
+        mob_char = 'O'
+        mob_color = libtcod.dark_red
+        mob_name = 'Ogre'
     else:
         fighter_component = fighter.Fighter(hp=5, defense=0, power=2, xp=5)
         ai_component = ai.BreedingMonster()
@@ -40,25 +67,36 @@ def spawn_fighter(x,y, monster_type='orc'):
     return monster
 
 
-def spawn_item(x, y, item_type):
+def spawn_item(x, y, dungeon_depth):
     """ Returns a item Entity with pos x, y of the class item_type"""
-    if item_type == 'healing_potion':
+
+    item_chances = {'healing_potion': 35,
+                    'sword': from_dungeon_depth([[5, 4]], dungeon_depth),
+                    'shield': from_dungeon_depth([[15, 8]], dungeon_depth),
+                    'lighting_scroll': from_dungeon_depth([[25, 4]], dungeon_depth),
+                    'fireball_scroll': from_dungeon_depth([[25, 6]], dungeon_depth),
+                    'confusion_scroll': from_dungeon_depth([[10, 2]], dungeon_depth)
+                    }
+
+    item_choice = random_choice_from_dict(item_chances)
+
+    if item_choice == 'healing_potion':
         item_component = Item(use_function=heal, amount=40)
         item = Entity(x, y, '!', libtcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM,
                       item=item_component)
-    elif item_type == 'sword':
+    elif item_choice == 'sword':
         equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)
-    elif item_type == 'shield':
+    elif item_choice == 'shield':
         equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
         item = Entity(x, y, '[', libtcod.dark_orange, 'Shield', equippable=equippable_component)
-    elif item_type == 'fireball_scroll':
+    elif item_choice == 'fireball_scroll':
         item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
             'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
                               damage=25, radius=3)
         item = Entity(x, y, '#', libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM,
                       item=item_component)
-    elif item_type == 'confusion_scroll':
+    elif item_choice == 'confusion_scroll':
         item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
             'Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan))
         item = Entity(x, y, '#', libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,

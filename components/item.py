@@ -5,3 +5,4 @@ class Item:
         self.targeting_message = targeting_message
         self.function_kwargs = kwargs
         
+# TODO Some items need to be stacked

@@ -17,7 +17,7 @@ class GameMap:
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
-        self.dungeon_level = dungeon_depth
+        self.dungeon_depth = dungeon_depth
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -81,7 +81,7 @@ class GameMap:
                 rooms.append(new_room)
                 num_rooms += 1
 
-        stairs_component = Stairs(self.dungeon_level + 1)
+        stairs_component = Stairs(self.dungeon_depth + 1)
         down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, ">", libtcod.white, 'Stairs',
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
         entities.append(down_stairs)
@@ -107,47 +107,34 @@ class GameMap:
         # TODO remove all generation of enemy / item away into spawner. Pass the dungeon level and return item.
 
         # max mobs based on dungeon depth
-        max_monsters_per_room = from_dungeon_depth([[2, 1], [3, 4], [5, 6]], self.dungeon_level)
-        max_items_per_room = from_dungeon_depth([[1, 1], [2, 4]], self.dungeon_level)
+        max_monsters_per_room = from_dungeon_depth([[2, 1], [3, 4], [5, 6]], self.dungeon_depth)
+        max_items_per_room = from_dungeon_depth([[1, 1], [2, 4]], self.dungeon_depth)
 
         # get a random number of monsters
         number_of_monsters = randint(0, max_monsters_per_room)
         number_of_items = randint(0, max_items_per_room)
-
-        monster_chances = {'orc': 80,
-                           'troll': from_dungeon_depth([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
-                           }
-
-        item_chances = {'healing_potion': 35,
-                        'sword': from_dungeon_depth([[5, 4]], self.dungeon_level),
-                        'shield': from_dungeon_depth([[15, 8]], self.dungeon_level),
-                        'lighting_scroll': from_dungeon_depth([[25, 4]], self.dungeon_level),
-                        'fireball_scroll': from_dungeon_depth([[25, 6]], self.dungeon_level),
-                        'confusion_scroll': from_dungeon_depth([[10, 2]], self.dungeon_level)
-                        }
 
         for i in range(number_of_monsters):
             # choose a random location in the room
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
 
-            # if there is no monster already on the location
+            # if there is no monster already on the location spawm a monster
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                monster_choice = random_choice_from_dict(monster_chances)
-                monster = spawn_fighter(x, y, monster_choice)
+                monster = spawn_fighter(x, y, self.dungeon_depth)
                 entities.append(monster)
 
         for i in range(number_of_items):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
 
+            # if there is no entity already on the location spawn an item
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item_choice = random_choice_from_dict(item_chances)
-                item = spawn_item(x, y, item_choice)
+                item = spawn_item(x, y, self.dungeon_depth)
                 entities.append(item)
 
     def next_floor(self, player, message_log, constants):
-        self.dungeon_level += 1
+        self.dungeon_depth += 1
         entities = [player]
 
         self.tiles = self.initialize_tiles()
