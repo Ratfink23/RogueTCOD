@@ -43,6 +43,9 @@ def inventory_menu(con, header, player, inventory_width, screen_width, screen_he
             options.append('{0} (on main hand)'.format(item.name))
         elif player.equipment.off_hand == item:
             options.append('{0} (on off hand)'.format(item.name))
+        # display the item stack count
+        elif item.stackable and item.stackable > 1:
+            options.append('{0} ({1})'.format(item.name, item.stackable))
         else:
             options.append(item.name)
 

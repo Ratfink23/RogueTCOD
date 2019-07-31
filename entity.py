@@ -10,7 +10,8 @@ class Entity:
     # TODO Add heath name to the entity, i.e. Healthy Orc, Wounded Troll, Undead Skeleton?
 
     def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None,
-                 item=None, inventory=None, stairs=None, level=None, equipment=None, equippable=None, state_name=None):
+                 item=None, inventory=None, stairs=None, level=None, equipment=None, equippable=None, stackable=None,
+                 state_name=None):
         self.x = x
         self.y = y
         self.char = char
@@ -26,6 +27,7 @@ class Entity:
         self.level = level
         self.equipment = equipment
         self.equippable = equippable
+        self.stackable = stackable
         self.state_name = state_name
 
         if self.fighter:

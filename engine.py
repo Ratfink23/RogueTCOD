@@ -167,7 +167,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
         elif pickup and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
                 if entity.item and entity.x == player.x and entity.y == player.y:
-                    pickup_results = player.inventory.add_item(entity)
+                    pickup_results = player.inventory.add_item(entity, entities)
                     player_turn_results.extend(pickup_results)
 
                     break
@@ -189,7 +189,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
             if game_state == GameStates.SHOW_INVENTORY:
                 player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map))
             elif game_state == GameStates.DROP_INVENTORY:
-                player_turn_results.extend(player.inventory.drop_item(item))
+                player_turn_results.extend(player.inventory.drop_item(item, entities))
 
         if take_stairs and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:

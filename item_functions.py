@@ -2,7 +2,9 @@ import tcod as libtcod
 
 from components import ai
 from game_messages import Message
+from render_functions import RenderOrder
 
+# TODO Change the consumed message to deal with multicharges etc.
 
 def heal(*args, **kwargs):
     entity = args[0]
@@ -92,7 +94,8 @@ def cast_confuse(*args, **kwargs):
         return results
 
     for entity in entities:
-        if entity.x == target_x and entity.y == target_y and entity != ai.ConfusedMonster and entity.ai:
+        # Entity at location x,y with an ai and isn't a corpse
+        if entity.x == target_x and entity.y == target_y and entity.ai and entity.render_order != RenderOrder.CORPSE:
             confused_ai = ai.ConfusedMonster(entity.ai, 10)
 
             confused_ai.owner = entity

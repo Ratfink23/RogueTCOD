@@ -66,9 +66,8 @@ class CorpseMonster:
         if index + 1 < len(self.corpse_labels):
             self.owner.state_name = self.corpse_labels[index + 1]
         else:
-            if randint(1, 10) >= 1:
-                # TODO Change test value back to normal
-                monster = spawn_fighter(self.owner.x, self.owner.y, monster='worm mass')
+            if randint(1, 10) >= 7:
+                monster = spawn_fighter(self.owner.x, self.owner.y, monster_type='worm mass')
                 entities.append(monster)
                 results.append({'message': Message('Something decays in the distance', libtcod.grey)})
             entities.remove(self.owner)
