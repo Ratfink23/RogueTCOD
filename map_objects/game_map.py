@@ -5,7 +5,7 @@ from components.staris import Stairs
 
 from render_functions import RenderOrder
 from entity import Entity
-from spawner import spawn_fighter, spawn_item
+from spawner import spawn_item, spawn_fighter
 from game_messages import Message
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
@@ -104,7 +104,6 @@ class GameMap:
             self.tiles[x][y].block_sight = False
 
     def place_entities(self, room, entities):
-        # TODO remove all generation of enemy / item away into spawner. Pass the dungeon level and return item.
 
         # max mobs based on dungeon depth
         max_monsters_per_room = from_dungeon_depth([[2, 1], [3, 4], [5, 6]], self.dungeon_depth)

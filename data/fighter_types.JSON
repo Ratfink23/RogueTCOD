@@ -1,0 +1,83 @@
+{
+  "orc":
+  {
+    "display_name": "Orc",
+    "color": [63, 255, 63],
+    "char": "o",
+    "fighter":
+    {
+      "hp": 20,
+      "defense": 0,
+      "power": 4,
+      "xp": 35
+    },
+    "ai": "BasicMonster",
+    "chance": [[80,1]]
+  },
+
+  "kobold":
+  {
+    "display_name": "Kobold",
+    "color": [63, 63, 255],
+    "char": "k",
+    "fighter":
+    {
+      "hp": 10,
+      "defense": 0,
+      "power": 3,
+      "xp": 15
+    },
+    "ai": "BasicMonster",
+    "chance": [[40,1]]
+  },
+
+  "troll":
+  {
+    "display_name": "Troll",
+    "color": [0, 191, 0],
+    "char": "T",
+    "fighter":
+    {
+      "hp": 30,
+      "defense": 2,
+      "power": 8,
+      "xp": 100
+    },
+    "ai": "BasicMonster",
+    "chance": [[15, 3], [30, 5], [60, 7]]
+  },
+
+  "ogre":
+  {
+    "display_name": "Ogre",
+    "color": [191, 0, 0],
+    "char": "0",
+    "fighter":
+    {
+      "hp": 30,
+      "defense": 5,
+      "power": 10,
+      "xp": 200
+    },
+    "ai": "BasicMonster",
+    "chance": [[15, 3], [30, 5], [60, 7]]
+  },
+
+  "worm mass":
+  {
+    "display_name": "Worm mass",
+    "color": [255, 255, 255],
+    "char": "w",
+    "fighter":
+    {
+      "hp": 5,
+      "defense": 0,
+      "power": 2,
+      "xp": 5
+    },
+    "ai": "BreedingMonster",
+    "chance": 0
+  }
+
+}
+

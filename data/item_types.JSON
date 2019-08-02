@@ -1,0 +1,103 @@
+{
+  "healing_potion":
+  {
+    "display_name": "Healing Potion",
+    "class": "potion-use",
+    "color": [127, 0, 255],
+    "char": "!",
+    "use": {
+      "function": "heal",
+      "amount": 40,
+      "stackable": 1
+    },
+    "chance": [[35, 1]]
+  },
+
+  "sword":
+  {
+    "display_name": "Short Sword",
+    "class": "melee-equipment",
+    "color":[0, 191, 255],
+    "char": "/",
+    "equipment":{
+      "slot": "MAIN_HAND",
+      "power_bonus": 3
+    },
+    "chance": [[5, 4]]
+  },
+
+  "dagger":
+  {
+    "display_name": "Dagger",
+    "class": "melee-equipment",
+    "color":[0, 191, 255],
+    "char": "-",
+    "equipment":{
+      "slot": "MAIN_HAND",
+      "power_bonus": 2
+    },
+    "chance": 0
+  },
+
+  "shield":
+  {
+    "display_name": "Wood Shield",
+    "class": "defense-equipment",
+    "color":[191, 95, 0],
+    "char": "[",
+    "equipment":{
+      "slot": "OFF_HAND",
+      "power_bonus": 1
+    },
+    "chance": [[15, 8]]
+  },
+
+  "lightning_scroll":
+  {
+    "display_name": "Lighting Scroll",
+    "class": "scroll-use-auto",
+    "color": [255, 255, 0],
+    "char": "#",
+    "use": {
+      "function": "cast_lightning",
+      "damage": 40,
+      "maximum_range": 5,
+      "stackable": 1
+    },
+    "chance": [[25, 4]]
+  },
+
+  "fireball_scroll":
+  {
+    "display_name": "Fireball Scroll",
+    "class": "scroll-use-blast",
+    "color": [255, 0, 0],
+    "char": "#",
+    "use": {
+      "function": "cast_fireball",
+      "targeting": 1,
+      "targeting_message": "Left-click a target tile, or right-click to cancel.",
+      "message_color":[63, 255, 255],
+      "damage": 25,
+      "radius": 3,
+      "stackable": 1
+    },
+    "chance": [[25, 6]]
+  },
+
+  "confusion_scroll":
+  {
+    "display_name": "Confusion Scroll",
+    "class": "scroll-use-single",
+    "color": [255, 63, 159],
+    "char": "#",
+    "use": {
+      "function": "cast_confuse",
+      "targeting": 1,
+      "targeting_message": "Left-click a target tile, or right-click to cancel.",
+      "message_color":[63, 255, 255],
+      "stackable": 1
+    },
+    "chance": [[10, 2]]
+  }
+}

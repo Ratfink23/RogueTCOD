@@ -5,6 +5,7 @@ from game_messages import Message
 from render_functions import RenderOrder
 
 # TODO Change the consumed message to deal with multicharges etc.
+# TODO change function names
 
 def heal(*args, **kwargs):
     entity = args[0]

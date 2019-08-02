@@ -81,14 +81,14 @@ def get_game_variables(constants):
     level_component = Level()
     equipment_component = Equipment()
     player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
-                fighter=fighter_component, inventory=inventory_component, level=level_component,
-                equipment=equipment_component)
+                    fighter=fighter_component, inventory=inventory_component, level=level_component,
+                    equipment=equipment_component)
 
     entities = [player]
 
     # Creates starting equipment
-    dagger = spawn_item(0, 0, item_type='dagger')
-    player.inventory.add_item(dagger, entities)
+    dagger = spawn_item(x=0, y=0, item_type='dagger')
+    player.inventory.add_item(dagger)
     player.equipment.toggle_equip(dagger)
 
     game_map = GameMap(constants['map_width'], constants['map_height'])

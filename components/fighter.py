@@ -11,6 +11,16 @@ class Fighter:
         self.xp = xp
 
     @property
+    def health_display(self):
+        health_index = ["Near Death", "Near Death", "Bleeding",
+                        "Bleeding", "Wounded", "Wounded",
+                        "Wounded", "Healthy", "Healthy", "Healthy"]
+        health_name = health_index[int(self.hp / self.max_hp * 10)]
+
+        return health_name
+
+
+    @property
     def max_hp(self):
         if self.owner and self.owner.equipment:
             bonus = self.owner.equipment.max_hp_bonus

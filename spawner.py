@@ -1,68 +1,97 @@
-import tcod as libtcod
+import copy
 
 from components import ai, fighter
 from components.equipment import EquipmentSlots
 from components.equippable import Equippable
-
 from components.item import Item
 
 from render_functions import RenderOrder
 from entity import Entity
 
+from loader_functions.data_loaders import import_json
 from game_messages import Message
 from item_functions import cast_confuse, cast_fireball, cast_lightning, heal
 from randon_utils import from_dungeon_depth, random_choice_from_dict
 
+fighter_base_dict = import_json('data/fighter_types.JSON')
+item_base_dict = import_json('data/item_types.JSON')
 
-def spawn_fighter(x,y, dungeon_depth=1, monster_type=None):
+def ai_factory(ai_name: dict):
+    if ai_name == "BasicMonster": return ai.BasicMonster()
+    if ai_name == "BreedingMonster": return ai.BreedingMonster()
+    if ai_name == "CorpseMonster": return ai.CorpseMonster()
+    assert 0, "Bad AI" + ai_name
+
+
+def equipable_factory(equipable_name: dict):
+    if 'MAIN_HAND' == equipable_name['slot']: slot = EquipmentSlots.MAIN_HAND
+    if 'OFF_HAND' == equipable_name['slot']: slot = EquipmentSlots.OFF_HAND
+    equipable_name.pop('slot')
+
+    return Equippable(slot, **equipable_name)
+
+
+def use_factory(use_name: dict):
+    kwargs = {}
+    if 'heal' in use_name['function']:
+        kwargs['use_function'] = heal
+    if 'cast_lightning' in use_name['function']:
+        kwargs['use_function'] = cast_lightning
+    if 'cast_fireball' in use_name['function']:
+        kwargs['use_function'] = cast_fireball
+    if 'cast_confuse' in use_name['function']:
+        kwargs['use_function'] = cast_confuse
+    use_name.pop('function')
+
+    if 'targeting_message' in use_name:
+        kwargs['targeting_message'] = Message(use_name['targeting_message'], use_name['message_color'])
+        use_name.pop('targeting_message')
+        use_name.pop('message_color')
+
+    if 'targeting' in use_name:
+        kwargs['targeting'] = True
+        use_name.pop('targeting')
+
+    return Item(**kwargs, **use_name)
+
+
+def spawn_fighter(x, y, dungeon_depth=1, fighter_type=None):
     """
     Returns a fighter Entity at x, y of monster_type if not None.
     Otherwise randomly assign a monster based on dungeon_depth
     :param x:
     :param y:
     :param dungeon_depth:
-    :param monster:
+    :param fighter_type:
     :return:
     """
-    # TODO Pull attributes of monsters from a lookup
-    monster_chances = {'orc': 80,
-                       'troll': from_dungeon_depth([[15, 3], [30, 5], [60, 7]], dungeon_depth),
-                       'ogre': from_dungeon_depth([[5,3], [10,5], [30, 7]], dungeon_depth)
-                       }
+
+    fighter_chances = dict()
+
+    for _f in fighter_base_dict:
+        if fighter_base_dict[_f]['chance']:
+            fighter_chances[_f] = from_dungeon_depth(fighter_base_dict[_f]['chance'], dungeon_depth)
 
     # If monster_type give ignore monster chances table
-    if monster_type:
-        monster_choice = monster_type
+    if fighter_type:
+        fighter_choice = fighter_type
     else:
-        monster_choice = random_choice_from_dict(monster_chances)
+        fighter_choice = random_choice_from_dict(fighter_chances)
 
-    if monster_choice == 'orc':
-        fighter_component = fighter.Fighter(hp=20, defense=0, power=4, xp=35)
-        ai_component = ai.BasicMonster()
-        mob_char = 'o'
-        mob_color = libtcod.light_green
-        mob_name = 'Orc'
-    elif monster_choice == 'troll':
-        fighter_component = fighter.Fighter(hp=30, defense=2, power=8, xp=100)
-        ai_component = ai.BasicMonster()
-        mob_char = 'T'
-        mob_color = libtcod.green
-        mob_name = 'Troll'
-    elif monster_choice == 'ogre':
-        fighter_component = fighter.Fighter(hp=30, defense=5, power=10, xp=200)
-        ai_component = ai.BasicMonster()
-        mob_char = 'O'
-        mob_color = libtcod.dark_red
-        mob_name = 'Ogre'
-    else:
-        fighter_component = fighter.Fighter(hp=5, defense=0, power=2, xp=5)
-        ai_component = ai.BreedingMonster()
-        mob_char = 'w'
-        mob_color = libtcod.white
-        mob_name = 'Worm mass'
+    # Deepcopy the dict so it can be popped
+    fighter_data = copy.deepcopy(fighter_base_dict[fighter_choice])
+
+    mob_name = fighter_data['display_name']
+    mob_char = fighter_data['char']
+    mob_color = fighter_data['color']
+    fighter_component = fighter.Fighter(hp=fighter_data['fighter']['hp'],
+                                        defense=fighter_data['fighter']['defense'],
+                                        power=fighter_data['fighter']['power'],
+                                        xp=fighter_data['fighter']['xp'])
+    ai_component = ai_factory(fighter_data['ai'])
 
     spawned_fighter = Entity(x, y, mob_char, mob_color, mob_name, blocks=True,
-                     render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                             render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
     return spawned_fighter
 
@@ -78,45 +107,32 @@ def spawn_item(x, y, dungeon_depth=1, item_type=None):
     :return:
     """
 
-    item_chances = {'healing_potion': 35,
-                    'sword': from_dungeon_depth([[5, 4]], dungeon_depth),
-                    'shield': from_dungeon_depth([[15, 8]], dungeon_depth),
-                    'lighting_scroll': from_dungeon_depth([[25, 4]], dungeon_depth),
-                    'fireball_scroll': from_dungeon_depth([[25, 6]], dungeon_depth),
-                    'confusion_scroll': from_dungeon_depth([[10, 2]], dungeon_depth)
-                    }
+    item_chances = dict()
+
+    for _f in item_base_dict:
+        if item_base_dict[_f]['chance']:
+            item_chances[_f] = from_dungeon_depth(item_base_dict[_f]['chance'], dungeon_depth)
+
     if item_type:
         item_choice = item_type
     else:
         item_choice = random_choice_from_dict(item_chances)
 
-    if item_choice == 'healing_potion':
-        item_component = Item(use_function=heal, amount=40)
-        item = Entity(x, y, '!', libtcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM,
-                      item=item_component, stackable=1)
-    elif item_choice == 'sword':
-        equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-        item = Entity(x, y, '/', libtcod.sky, 'Short Sword', equippable=equippable_component)
-    elif item_choice == 'shield':
-        equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
-        item = Entity(x, y, '[', libtcod.dark_orange, 'Wood Shield', equippable=equippable_component)
-    elif item_choice == 'fireball_scroll':
-        item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
-            'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
-                              damage=25, radius=3)
-        item = Entity(x, y, '#', libtcod.red, 'Fireball Scroll', render_order=RenderOrder.ITEM,
+    # Deepcopy the dict so it can be popped
+    item_data = copy.deepcopy(item_base_dict[item_choice])
+
+    item_name = item_data['display_name']
+    item_char = item_data['char']
+    item_color = item_data['color']
+
+    if 'equipment' in item_data:
+        equippable_component = equipable_factory(item_data['equipment'])
+        print(item_base_dict[item_choice])
+        item = Entity(x, y, item_char, item_color, item_name, equippable=equippable_component,
+                      render_order=RenderOrder.ITEM)
+    elif 'use' in item_data:
+        item_component = use_factory(item_data['use'])
+        item = Entity(x, y, item_char, item_color, item_name, render_order=RenderOrder.ITEM,
                       item=item_component)
-    elif item_choice == 'confusion_scroll':
-        item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
-            'Left-click an enemy to confuse it, or right-click to cancel.', libtcod.light_cyan))
-        item = Entity(x, y, '#', libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,
-                      item=item_component)
-    elif item_choice == 'lighting_scroll':
-        item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5)
-        item = Entity(x, y, '#', libtcod.yellow, 'Lighting Scroll', render_order=RenderOrder.ITEM,
-                      item=item_component)
-    else:
-        equipment_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
-        item = Entity(x, y, '-', libtcod.sky, 'Dagger', equippable=equipment_component)
 
     return item

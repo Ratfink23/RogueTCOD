@@ -11,16 +11,17 @@ from loader_functions.data_loaders import load_game, save_game
 from menus import main_menu, message_box
 from render_functions import clear_all, render_mouse, render_all, RenderOrder
 
+
 def main():
     constants = get_constants()
 
-    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_set_custom_font('data/arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
     libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'],
                               False, libtcod.RENDERER_SDL2, 'F', True)
 
-    con = libtcod.console.Console(constants['screen_width'],constants['screen_height'])
-    mouse_window = libtcod.console.Console(constants['screen_width'],constants['screen_height'])
+    con = libtcod.console.Console(constants['screen_width'], constants['screen_height'])
+    mouse_window = libtcod.console.Console(constants['screen_width'], constants['screen_height'])
     panel = libtcod.console.Console(constants['screen_width'], constants['panel_height'])
 
     player = None
@@ -80,6 +81,7 @@ def main():
 
             show_main_menu = True
 
+
 def play_game(player, entities, game_map, message_log, game_state, con, panel, mouse_window, constants):
     fov_recompute = True
 
@@ -101,7 +103,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'],
                           constants['fov_algorithm'])
-
 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log,
                    constants['screen_width'], constants['screen_height'], constants['bar_width'],
@@ -167,7 +168,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
         elif pickup and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
                 if entity.item and entity.x == player.x and entity.y == player.y:
-                    pickup_results = player.inventory.add_item(entity, entities)
+                    pickup_results = player.inventory.add_item(entity)
                     player_turn_results.extend(pickup_results)
 
                     break
@@ -189,7 +190,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
             if game_state == GameStates.SHOW_INVENTORY:
                 player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map))
             elif game_state == GameStates.DROP_INVENTORY:
-                player_turn_results.extend(player.inventory.drop_item(item, entities))
+                player_turn_results.extend(player.inventory.drop_item(item))
 
         if take_stairs and game_state == GameStates.PLAYERS_TURN:
             for entity in entities:
@@ -266,7 +267,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
 
             if item_added:
                 entities.remove(item_added)
-
                 game_state = GameStates.ENEMY_TURN
 
             if item_consumed:

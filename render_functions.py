@@ -106,7 +106,6 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
 
 def get_names_under_mouse(mouse, entities, fov_map):
-    # TODO Highlight area under mouse
     (x, y) = (mouse.cx, mouse.cy)
     names = [entity.full_name for entity in entities if entity.x == x and entity.y == y and
              libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]

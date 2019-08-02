@@ -8,6 +8,7 @@ from spawner import spawn_fighter
 # TODO redo Breeding AI to add breeding
 # TODO Change CorpseMonster to spawn different monster based on decay
 
+
 class BasicMonster:
     # TODO Monster memory of where the last target was
     def take_turn(self, target, fov_map, game_map, entities):
@@ -67,7 +68,7 @@ class CorpseMonster:
             self.owner.state_name = self.corpse_labels[index + 1]
         else:
             if randint(1, 10) >= 7:
-                monster = spawn_fighter(self.owner.x, self.owner.y, monster_type='worm mass')
+                monster = spawn_fighter(self.owner.x, self.owner.y, fighter_type='worm mass')
                 entities.append(monster)
                 results.append({'message': Message('Something decays in the distance', libtcod.grey)})
             entities.remove(self.owner)
