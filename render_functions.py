@@ -5,11 +5,12 @@ from enum import Enum
 from game_states import GameStates
 from menus import character_screen, inventory_menu, level_up_menu
 
+
 class RenderOrder(Enum):
-        STAIRS = 1
-        CORPSE = 2
-        ITEM = 3
-        ACTOR = 4
+    STAIRS = 1
+    CORPSE = 2
+    ITEM = 3
+    ACTOR = 4
 
 
 def render_mouse(mouse_window, mouse, screen_width, screen_height, fov_map):
@@ -136,12 +137,11 @@ def clear_all(con, entities):
 
 def draw_entity(con, entity, fov_map, game_map):
     """
-    Draw entity with background (def=None) on con if within the fov_map or entity is stairs and explored
-    :param con:
-    :param entity:
-    :param fov_map:
-    :param game_map:
-    :param background:
+    Draw entity within the fov_map or entity is stairs and explored
+    :param con: Console
+    :param entity: Entity
+    :param fov_map: FOV Map
+    :param game_map: Game Map
     :return:
     """
     if libtcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):

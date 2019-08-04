@@ -16,22 +16,20 @@ class Inventory:
         if len(self.items) >= self.capacity:
             results.append({
                 'item_added': None,
-                'message': Message('You can not carry any more', libtcod.yellow)
+                'message': Message('You can not carry any more', 'minor_error')
             })
         else:
             results.append({
                 'item_added': item_entity,
-                'message': Message('You pick up the {0}!'.format(item_entity.name), libtcod.light_blue)
+                'message': Message('You pick up the {0}!'.format(item_entity.display_name), 'minor_event')
             })
 
-            # TODO Review this code. I'm sure there is a better way
             # Check if can be stacked
             if not item_entity.item.stackable:
                 self.items.append(item_entity)
             else:
                 # check for same item type by look at the name
                 for item_check in self.items:
-                    # TODO need to add item type into items for checks
                     if item_check.name == item_entity.name:
                         item_check.item.stackable += 1
                         stacked = True
@@ -52,14 +50,13 @@ class Inventory:
             if equippable_component:
                 results.append({'equip': item_entity})
             else:
-                results.append({'message': Message('The {0} cannot be used'.format(item_entity.name), libtcod.yellow)})
+                results.append({'message': Message('The {0} cannot be used'.format(item_entity.name), 'minor_error')})
 
         else:
             if item_component.targeting and not (kwargs.get('target_x') or kwargs.get('target_y')):
                 results.append({'targeting': item_entity})
             else:
                 kwargs = {**item_component.function_kwargs, **kwargs}
-                print(type(kwargs))
                 item_use_results = item_component.use_function(self.owner, **kwargs)
 
                 for item_use_result in item_use_results:
@@ -92,11 +89,11 @@ class Inventory:
             # Reduce stack size
             item_entity.item.stackable -= 1
             # Create a new item to drop
-            # TODO fix the item type. might need to give items a type
-            item_entity = spawn_item(self.owner.x, self.owner.y, item_type='healing_potion')
+            item_entity = spawn_item(self.owner.x, self.owner.y, item_type=item_entity.name)
         else:
             self.remove_item(item_entity)
 
-        results.append({'item_dropped': item_entity, 'message': Message('You dropped the {0}'.format(item_entity.name), libtcod.dark_yellow)})
+        results.append({'item_dropped': item_entity, 'message':
+            Message('You dropped the {0}'.format(item_entity.display_name), 'minor_event')})
 
         return results

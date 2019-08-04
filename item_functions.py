@@ -4,7 +4,6 @@ from components import ai
 from game_messages import Message
 from render_functions import RenderOrder
 
-# TODO Change the consumed message to deal with multicharges etc.
 # TODO change function names
 
 def heal(*args, **kwargs):
@@ -14,10 +13,10 @@ def heal(*args, **kwargs):
     results = []
 
     if entity.fighter.hp == entity.fighter.max_hp:
-        results.append({'consumed': False, 'message': Message('You are already at full health', libtcod.yellow)})
+        results.append({'consumed': False, 'message': Message('You are already at full health', 'minor_error')})
     else:
         entity.fighter.heal(amount)
-        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', libtcod.green)})
+        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', 'effect_bonus')})
 
     return results
 
@@ -44,11 +43,13 @@ def cast_lightning(*args, **kwargs):
 
     if target:
         results.append({'consumed': True, 'target': target, 'message': Message(
-            'A lighting bolt strikes the {0} with loud thunder! The damage is {1}'.format(target.name, damage))})
+            'A lighting bolt strikes the {0} with loud thunder! The damage is {1}'.format(target.name, damage),
+            'effect_damage')})
         results.extend(target.fighter.take_damage(damage))
     else:
         results.append(
-            {'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', libtcod.red)})
+            {'consumed': False, 'target': None, 'message':
+                Message('No enemy is close enough to strike.', 'minor_error')})
 
     return results
 
@@ -65,17 +66,17 @@ def cast_fireball(*args, **kwargs):
 
     if not libtcod.map_is_in_fov(fov_map, target_x, target_y):
         results.append({'consumed': False,
-                        'message': Message('You cannot target a tile outside your field of view.', libtcod.yellow)})
+                        'message': Message('You cannot target a tile outside your field of view.', 'minor_error')})
         return results
 
     results.append({'consumed': True,
                     'message': Message('The fireball explodes, burning everything with {0} tiles'.format(radius),
-                                       libtcod.orange)})
+                                       'minor_effect')})
 
     for entity in entities:
         if entity.distance(target_x, target_y) <= radius and entity.fighter:
             results.append({'message': Message('The {0} gets burned for {1} hit points.'.format(entity.name, damage),
-                                               libtcod.orange)})
+                                               'effect_damage')})
             results.extend(entity.fighter.take_damage(damage))
 
     return results
@@ -91,7 +92,7 @@ def cast_confuse(*args, **kwargs):
 
     if not libtcod.map_is_in_fov(fov_map, target_x, target_y):
         results.append({'consumed': False,
-                        'message': Message('You cannot target a tile outside your field of view.', libtcod.yellow)})
+                        'message': Message('You cannot target a tile outside your field of view.', 'minor_error')})
         return results
 
     for entity in entities:
@@ -103,12 +104,12 @@ def cast_confuse(*args, **kwargs):
             entity.ai = confused_ai
 
             results.append({'consumed': True,
-                            'message': Message('{0} looks confused, as they starts top stumble around!'.format(entity.full_name),
-                libtcod.light_green)})
+                            'message': Message('{0} looks confused, as they starts to stumble around!'
+                                               .format(entity.full_name), 'minor_effect')})
 
             break
     else:
         results.append(
-            {'consumed': False, 'message': Message('There is no targetable enemy at that location.', libtcod.yellow)})
+            {'consumed': False, 'message': Message('There is no enemy at that location.', 'minor_error')})
 
     return results

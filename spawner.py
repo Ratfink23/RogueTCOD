@@ -20,6 +20,7 @@ def ai_factory(ai_name: dict):
     if ai_name == "BasicMonster": return ai.BasicMonster()
     if ai_name == "BreedingMonster": return ai.BreedingMonster()
     if ai_name == "CorpseMonster": return ai.CorpseMonster()
+    if ai_name == "ArcherMonster": return ai.ArcherMonster()
     assert 0, "Bad AI" + ai_name
 
 
@@ -81,7 +82,7 @@ def spawn_fighter(x, y, dungeon_depth=1, fighter_type=None):
     # Deepcopy the dict so it can be popped
     fighter_data = copy.deepcopy(fighter_base_dict[fighter_choice])
 
-    mob_name = fighter_data['display_name']
+    mob_display_name = fighter_data['display_name']
     mob_char = fighter_data['char']
     mob_color = fighter_data['color']
     fighter_component = fighter.Fighter(hp=fighter_data['fighter']['hp'],
@@ -90,7 +91,7 @@ def spawn_fighter(x, y, dungeon_depth=1, fighter_type=None):
                                         xp=fighter_data['fighter']['xp'])
     ai_component = ai_factory(fighter_data['ai'])
 
-    spawned_fighter = Entity(x, y, mob_char, mob_color, mob_name, blocks=True,
+    spawned_fighter = Entity(x, y, mob_char, mob_color, fighter_choice, display_name=mob_display_name, blocks=True,
                              render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
     return spawned_fighter
@@ -121,18 +122,17 @@ def spawn_item(x, y, dungeon_depth=1, item_type=None):
     # Deepcopy the dict so it can be popped
     item_data = copy.deepcopy(item_base_dict[item_choice])
 
-    item_name = item_data['display_name']
+    item_displayname = item_data['display_name']
     item_char = item_data['char']
     item_color = item_data['color']
 
     if 'equipment' in item_data:
         equippable_component = equipable_factory(item_data['equipment'])
-        print(item_base_dict[item_choice])
-        item = Entity(x, y, item_char, item_color, item_name, equippable=equippable_component,
-                      render_order=RenderOrder.ITEM)
+        item = Entity(x, y, item_char, item_color, item_choice, display_name=item_displayname,
+                      equippable=equippable_component, render_order=RenderOrder.ITEM)
     elif 'use' in item_data:
         item_component = use_factory(item_data['use'])
-        item = Entity(x, y, item_char, item_color, item_name, render_order=RenderOrder.ITEM,
-                      item=item_component)
+        item = Entity(x, y, item_char, item_color, item_choice, display_name=item_displayname,
+                      render_order=RenderOrder.ITEM, item=item_component)
 
     return item

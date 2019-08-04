@@ -27,7 +27,7 @@
       "power": 3,
       "xp": 15
     },
-    "ai": "BasicMonster",
+    "ai": "ArcherMonster",
     "chance": [[40,1]]
   },
 
@@ -77,7 +77,54 @@
     },
     "ai": "BreedingMonster",
     "chance": 0
-  }
+  },
 
+  "zombie":
+  {
+    "display_name": "Zombie",
+    "color": [255, 255, 127],
+    "char": "z",
+    "fighter":
+    {
+      "hp": 10,
+      "defense": 1,
+      "power": 4,
+      "xp": 30
+    },
+    "ai": "BasicMonster",
+    "chance": 0
+  },
+
+  "skeleton":
+  {
+    "display_name": "Skeleton",
+    "color": [255, 255, 255],
+    "char": "s",
+    "fighter":
+    {
+      "hp": 10,
+      "defense": 1,
+      "power": 5,
+      "xp": 40
+    },
+    "ai": "BasicMonster",
+    "chance": 0
+  },
+
+  "floating skull":
+  {
+    "display_name": "Floating Skull",
+    "color": [191, 0, 0],
+    "char": "e",
+    "fighter":
+    {
+      "hp": 30,
+      "defense": 1,
+      "power": 7,
+      "xp": 80
+    },
+    "ai": "BasicMonster",
+    "chance": 0
+  }
 }
 

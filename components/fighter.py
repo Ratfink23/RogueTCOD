@@ -12,9 +12,10 @@ class Fighter:
 
     @property
     def health_display(self):
-        health_index = ["Near Death", "Near Death", "Bleeding",
-                        "Bleeding", "Wounded", "Wounded",
-                        "Wounded", "Healthy", "Healthy", "Healthy"]
+        health_index = ["Dying", "Near Death", "Near Death",
+                        "Bleeding", "Bleeding", "Bleeding",
+                        "Wounded", "Wounded", "Wounded",
+                        "Healthy", "Healthy", "Healthy", "Healthy"]
         health_name = health_index[int(self.hp / self.max_hp * 10)]
 
         return health_name
@@ -63,17 +64,34 @@ class Fighter:
         if self.hp > self.max_hp:
             self.hp = self.max_hp
 
-    def attack(self, target):
+    def attack_melee(self, target):
+        # TODO different types of melee attacks?
         results = []
 
         damage = self.power - target.fighter.defense
 
         if damage > 0:
             results.append({'message': Message('{0} attacks {1} for {2} hit points.'.format(
-                self.owner.name.capitalize(), target.name, str(damage)), libtcod.white)})
+                self.owner.name.capitalize(), target.name, str(damage)), 'combat_damage')})
             results.extend(target.fighter.take_damage(damage))
         else:
             results.append({'message': Message('{0} attacks {1} but does no damage.'.format(
-                self.owner.name.capitalize(), target.name), libtcod.white)})
+                self.owner.name.capitalize(), target.name), 'combat_event')})
+
+        return results
+
+    def attack_range(self, target):
+        # TODO different types of melee attacks?
+        results = []
+
+        damage = self.power - target.fighter.defense
+
+        if damage > 0:
+            results.append({'message': Message('{0} fires at {1} for {2} hit points.'.format(
+                self.owner.name.capitalize(), target.name, str(damage)), 'combat_damage')})
+            results.extend(target.fighter.take_damage(damage))
+        else:
+            results.append({'message': Message('{0} fires at {1} but does no damage.'.format(
+                self.owner.name.capitalize(), target.name), 'combat_event')})
 
         return results

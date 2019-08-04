@@ -7,9 +7,8 @@ from render_functions import RenderOrder
 
 class Entity:
     # A generic object to represent players, enemies, items etc.
-    # TODO Add heath name to the entity, i.e. Healthy Orc, Wounded Troll, Undead Skeleton?
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None,
+    def __init__(self, x, y, char, color, name, display_name=None, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None,
                  item=None, inventory=None, stairs=None, level=None, equipment=None, equippable=None,
                  state_name=None):
         self.x = x
@@ -17,6 +16,7 @@ class Entity:
         self.char = char
         self.color = color
         self.name = name
+        self.display_name = display_name
         self.blocks = blocks
         self.render_order = render_order
         self.fighter = fighter
@@ -61,9 +61,11 @@ class Entity:
     def full_name(self):
         # Returns the full name of an entity
         if self.state_name:
-            fullname = self.name + ' ' + self.state_name
+            fullname = self.display_name + ' ' + self.state_name
         else:
-            fullname = self.name
+            fullname = self.display_name
+        if self.fighter:
+            fullname = fullname + ' (' + self.fighter.health_display + ')'
 
         return fullname
 
@@ -84,6 +86,20 @@ class Entity:
         if not (game_map.is_blocked(self.x + dx, self.y + dy) or
                 get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
             self.move(dx, dy)
+
+    def move_away(self, target_x, target_y, game_map, entities):
+        # Move entity one step away direction of target with block check
+        dx = target_x + self.x
+        dy = target_y + self.y
+        distance = math.sqrt(dx ** 2 + dy ** 2)
+
+        dx = int(round(dx / distance))
+        dy = int(round(dy / distance))
+
+        if not (game_map.is_blocked(self.x + dx, self.y + dy) or
+                get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
+            self.move(dx, dy)
+
 
     def move_astar(self, target, entities, game_map):
         # Astar movement code directly from Roguelike Tutorial

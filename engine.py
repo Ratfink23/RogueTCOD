@@ -131,7 +131,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
         take_stairs = action.get('take_stairs')
         level_up = action.get('level_up')
         show_character_screen = action.get('show_character_screen')
-        exit = action.get('exit')
+        exit_screen = action.get('exit')
         fullscreen = action.get('fullscreen')
 
         left_click = mouse_action.get('left_click')
@@ -149,14 +149,14 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
 
                 if target:
-                    attack_results = player.fighter.attack(target)
+                    attack_results = player.fighter.attack_melee(target)
                     player_turn_results.extend(attack_results)
                 else:
                     player.move(dx, dy)
                     for entity in entities:
                         # display entities on the floor unless they are the ACTOR
                         if entity.x == player.x and entity.y == player.y and entity.render_order != RenderOrder.ACTOR:
-                            message_log.add_message(Message('{0} is here'.format(entity.full_name), libtcod.yellow))
+                            message_log.add_message(Message('{0} is here'.format(entity.full_name), 'map_item'))
 
                     fov_recompute = True
 
@@ -173,7 +173,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
 
                     break
             else:
-                message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
+                message_log.add_message(Message('There is nothing here to pick up.', 'minor_error'))
 
         if show_inventory:
             previous_game_state = game_state
@@ -202,7 +202,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
 
                     break
             else:
-                message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
+                message_log.add_message(Message('There are no stairs here.', 'minor_error'))
 
         if level_up:
             if level_up == 'hp':
@@ -229,7 +229,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
             elif right_click:
                 player_turn_results.append({'targeting_cancelled': True})
 
-        if exit:
+        if exit_screen:
             if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY, GameStates.CHARACTER_SCREEN):
                 # On exit of in-game menu return to old state
                 game_state = previous_game_state
@@ -284,10 +284,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
                     unequipped = equip_result.get('unequipped')
 
                     if equipped:
-                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name)))
+                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name),'minor_event'))
 
                     if unequipped:
-                        message_log.add_message(Message('You unequipped the {0}'.format(unequipped.name)))
+                        message_log.add_message(Message('You unequipped the {0}'.format(unequipped.name),'minor_event'))
 
                 game_state = GameStates.ENEMY_TURN
 
@@ -302,15 +302,15 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, m
             if targeting_cancelled:
                 game_state = previous_game_state
 
-                message_log.add_message(Message('Targeting cancelled'))
+                message_log.add_message(Message('Targeting cancelled', 'minor_error'))
 
             if xp:
                 leveled_up = player.level.add_xp(xp)
-                message_log.add_message(Message('You gain {0} experience points.'.format(xp)))
+                message_log.add_message(Message('You gain {0} experience points.'.format(xp), 'combat_event'))
 
                 if leveled_up:
                     message_log.add_message(Message('Your battle skill grows stronger! You reached level {0}'.format(
-                            player.level.current_level) + '!', libtcod.yellow))
+                            player.level.current_level) + '!', 'major_event'))
                     previous_game_state = game_state
                     game_state = GameStates.LEVEL_UP
 
