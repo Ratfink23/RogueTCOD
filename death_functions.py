@@ -22,7 +22,8 @@ def kill_monster(monster):
     dead_ai = ai.CorpseMonster()
     dead_ai.owner = monster
     monster.ai = dead_ai
-    monster.state_name = "corpse"
+    monster.state_prefix = None
+    monster.state_suffix = "corpse"
     monster.render_order = RenderOrder.CORPSE
 
     return death_message

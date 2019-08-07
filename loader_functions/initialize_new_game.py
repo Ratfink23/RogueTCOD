@@ -90,6 +90,8 @@ def get_game_variables(constants):
     dagger = spawn_item(x=0, y=0, item_type='dagger')
     player.inventory.add_item(dagger)
     player.equipment.toggle_equip(dagger)
+    scroll = spawn_item(x=0, y=0, item_type='confusion_scroll')
+    player.inventory.add_item(scroll)
 
     game_map = GameMap(constants['map_width'], constants['map_height'])
     game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],

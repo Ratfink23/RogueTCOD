@@ -11,7 +11,7 @@
       "power": 4,
       "xp": 35
     },
-    "ai": "BasicMonster",
+    "ai": "MeleeMonster",
     "chance": [[80,1]]
   },
 
@@ -43,7 +43,7 @@
       "power": 8,
       "xp": 100
     },
-    "ai": "BasicMonster",
+    "ai": "MeleeMonster",
     "chance": [[15, 3], [30, 5], [60, 7]]
   },
 
@@ -59,7 +59,7 @@
       "power": 10,
       "xp": 200
     },
-    "ai": "BasicMonster",
+    "ai": "MeleeMonster",
     "chance": [[15, 3], [30, 5], [60, 7]]
   },
 
@@ -91,7 +91,7 @@
       "power": 4,
       "xp": 30
     },
-    "ai": "BasicMonster",
+    "ai": "MeleeMonster",
     "chance": 0
   },
 
@@ -107,7 +107,7 @@
       "power": 5,
       "xp": 40
     },
-    "ai": "BasicMonster",
+    "ai": "MeleeMonster",
     "chance": 0
   },
 
@@ -123,7 +123,7 @@
       "power": 7,
       "xp": 80
     },
-    "ai": "BasicMonster",
+    "ai": "ArcherMonster",
     "chance": 0
   }
 }

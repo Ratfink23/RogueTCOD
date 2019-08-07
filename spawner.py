@@ -16,8 +16,9 @@ from randon_utils import from_dungeon_depth, random_choice_from_dict
 fighter_base_dict = import_json('data/fighter_types.JSON')
 item_base_dict = import_json('data/item_types.JSON')
 
+
 def ai_factory(ai_name: dict):
-    if ai_name == "BasicMonster": return ai.BasicMonster()
+    if ai_name == "MeleeMonster": return ai.MeleeMonster()
     if ai_name == "BreedingMonster": return ai.BreedingMonster()
     if ai_name == "CorpseMonster": return ai.CorpseMonster()
     if ai_name == "ArcherMonster": return ai.ArcherMonster()

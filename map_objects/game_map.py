@@ -1,4 +1,3 @@
-import tcod as libtcod
 from random import randint
 
 from components.staris import Stairs
@@ -82,8 +81,8 @@ class GameMap:
                 num_rooms += 1
 
         stairs_component = Stairs(self.dungeon_depth + 1)
-        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, ">", libtcod.white, 'Stairs',
-                             render_order=RenderOrder.STAIRS, stairs=stairs_component)
+        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, ">", [255, 255, 255], name='Stairs',
+                             display_name='Down Stairs', render_order=RenderOrder.STAIRS, stairs=stairs_component)
         entities.append(down_stairs)
 
     def create_room(self, room):

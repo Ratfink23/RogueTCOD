@@ -12,14 +12,11 @@ class Fighter:
 
     @property
     def health_display(self):
-        health_index = ["Dying", "Near Death", "Near Death",
-                        "Bleeding", "Bleeding", "Bleeding",
-                        "Wounded", "Wounded", "Wounded",
-                        "Healthy", "Healthy", "Healthy", "Healthy"]
+        health_index = ["Dying", "Near Death", "Near Death", "Bleeding", "Bleeding", "Bleeding",
+                        "Wounded", "Wounded", "Wounded", "Healthy", "Healthy", "Healthy", "Healthy"]
         health_name = health_index[int(self.hp / self.max_hp * 10)]
 
         return health_name
-
 
     @property
     def max_hp(self):

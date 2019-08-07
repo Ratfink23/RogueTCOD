@@ -8,7 +8,7 @@ class Message:
                       'major_death': [255, 0, 0],
                       'minor_death': [255, 127, 0],
                       'minor_effect': [63, 255, 63],
-                      'map_effect': [159, 159, 159],
+                      'map_unseen': [159, 159, 159],
                       'map_item': [255, 255, 0],
                       'minor_error': [127, 127, 255],
                       'minor_event': [63, 63, 255],
