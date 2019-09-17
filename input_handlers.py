@@ -1,6 +1,7 @@
 import tcod as libtcod
 from game_states import GameStates
 
+#todo change the input handler to work with tcod not libtcod
 def handle_keys(key, game_state):
     if game_state == GameStates.PLAYERS_TURN:
         return handle_player_turn_keys(key)
@@ -17,7 +18,7 @@ def handle_keys(key, game_state):
 
     return {}
 
-
+#todo change the input handler to work with tcod not libtcod
 def handle_player_turn_keys(key):
     # Player TURN valid keys
     key_char = chr(key.c)

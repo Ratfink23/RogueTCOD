@@ -1,6 +1,6 @@
 import tcod as libtcod
 
-
+#todo redo all menu to use new tcod standards
 def menu(con, header, options, width, screen_width, screen_height):
 
     if len(options) > 26: raise ValueError('Cannot have a menu with more than 26 options.')

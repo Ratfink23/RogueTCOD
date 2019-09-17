@@ -18,10 +18,14 @@ item_base_dict = import_json('data/item_types.JSON')
 
 
 def ai_factory(ai_name: dict):
-    if ai_name == "MeleeMonster": return ai.MeleeMonster()
-    if ai_name == "BreedingMonster": return ai.BreedingMonster()
-    if ai_name == "CorpseMonster": return ai.CorpseMonster()
-    if ai_name == "ArcherMonster": return ai.ArcherMonster()
+    if ai_name == "MeleeMonster":
+        return ai.MeleeMonster()
+    if ai_name == "BreedingMonster":
+        return ai.BreedingMonster()
+    if ai_name == "CorpseMonster":
+        return ai.CorpseMonster()
+    if ai_name == "ArcherMonster":
+        return ai.ArcherMonster()
     assert 0, "Bad AI" + ai_name
 
 

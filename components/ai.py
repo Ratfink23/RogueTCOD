@@ -4,7 +4,7 @@ from random import randint
 from game_messages import Message
 from spawner import spawn_fighter
 
-# TODO redo Breeding AI to add breeding
+
 class MeleeMonster:
     """
     Basic Melee attack AI that follow the target if within the player FOV and try to get close enough to attack
@@ -23,6 +23,7 @@ class MeleeMonster:
     def take_turn(self, target, fov_map, game_map, entities):
         results = []
         monster = self.owner
+        #todo replace 'map_is_in_fov' with map.Map.fov
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
             # Should I run away and panic?
             if int(monster.fighter.hp / monster.fighter.max_hp * 10) <= self.flee_level:
@@ -72,6 +73,7 @@ class ArcherMonster:
     def take_turn(self, target, fov_map, game_map, entities):
         results = []
         monster = self.owner
+        #todo replace 'map_is_in_fov' with map.Map.fov
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
             if monster.distance_to(target) >= self.max_range:
                 monster.move_astar(target, entities, game_map)
@@ -97,11 +99,13 @@ class ArcherMonster:
         return results
 
 
+#todo add breeding to breeding AI
 class BreedingMonster:
     def take_turn(self, target, fov_map, game_map, entities):
         results = []
 
         monster = self.owner
+        #todo replace 'map_is_in_fov' with map.Map.fov
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
 
             if monster.distance_to(target) >= 2:
@@ -125,6 +129,7 @@ class CorpseMonster:
     def take_turn(self, target, fov_map, game, entities):
         results = []
         # decay corpse if outside of FOV
+        #todo replace 'map_is_in_fov' with map.Map.fov
         if not libtcod.map_is_in_fov(fov_map, self.owner.x, self.owner.y):
             if randint(50, 200) < self.decay_amount:
                 results = self.decay(entities)

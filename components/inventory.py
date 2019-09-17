@@ -1,5 +1,3 @@
-import tcod as libtcod
-
 from game_messages import Message
 from spawner import spawn_item
 

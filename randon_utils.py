@@ -1,11 +1,13 @@
 from random import randint
 
+
 def from_dungeon_depth(table, depth):
     for (value, level) in reversed(table):
         if depth >= level:
             return value
 
     return 0
+
 
 def random_choice_index(chances):
     random_chance = randint(1, sum(chances))
@@ -18,6 +20,7 @@ def random_choice_index(chances):
         if random_chance <= running_sum:
             return choice
         choice += 1
+
 
 def random_choice_from_dict(choice_dict):
     choices = list(choice_dict.keys())

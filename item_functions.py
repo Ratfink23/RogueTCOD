@@ -4,7 +4,6 @@ from components import ai
 from game_messages import Message
 from render_functions import RenderOrder
 
-# TODO change function names
 
 def heal(*args, **kwargs):
     entity = args[0]
@@ -34,6 +33,7 @@ def cast_lightning(*args, **kwargs):
     closet_distance = maximum_range + 1
 
     for entity in entities:
+        #todo change map_is_in_fov to map.Map.fov
         if entity.fighter and entity != caster and libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
             distance = caster.distance_to(entity)
 
@@ -64,6 +64,7 @@ def cast_fireball(*args, **kwargs):
 
     results = []
 
+    #todo change map_is_in_fov to map.Map.fov
     if not libtcod.map_is_in_fov(fov_map, target_x, target_y):
         results.append({'consumed': False,
                         'message': Message('You cannot target a tile outside your field of view.', 'minor_error')})
@@ -90,6 +91,7 @@ def cast_confuse(*args, **kwargs):
 
     results = []
 
+    #todo change map_is_in_fov to map.Map.fov
     if not libtcod.map_is_in_fov(fov_map, target_x, target_y):
         results.append({'consumed': False,
                         'message': Message('You cannot target a tile outside your field of view.', 'minor_error')})

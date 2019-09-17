@@ -1,5 +1,6 @@
 import textwrap
 
+
 class Message:
     # TODO pull these from constant?
     message_colors = {'default': [255, 255, 255],

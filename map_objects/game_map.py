@@ -8,7 +8,7 @@ from spawner import spawn_item, spawn_fighter
 from game_messages import Message
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
-from randon_utils import random_choice_from_dict, from_dungeon_depth
+from randon_utils import from_dungeon_depth
 
 
 class GameMap:
@@ -103,7 +103,6 @@ class GameMap:
             self.tiles[x][y].block_sight = False
 
     def place_entities(self, room, entities):
-
         # max mobs based on dungeon depth
         max_monsters_per_room = from_dungeon_depth([[2, 1], [3, 4], [5, 6]], self.dungeon_depth)
         max_items_per_room = from_dungeon_depth([[1, 1], [2, 4]], self.dungeon_depth)
